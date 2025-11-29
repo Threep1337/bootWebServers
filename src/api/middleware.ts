@@ -1,5 +1,5 @@
 import { Request, Response,NextFunction } from "express";
-import { config } from "./config.js";
+import { config } from "../config.js";
 
 export async function middlewareLogResponses (req: Request, res: Response, next: NextFunction): Promise<void>{
 
@@ -13,7 +13,7 @@ export async function middlewareLogResponses (req: Request, res: Response, next:
 
 }
 
-export async function middlewareMetricsInc (req: Request, res: Response, next: NextFunction): Promise<void>{
-  config.fileserverHits++;
+export function middlewareMetricsInc (req: Request, res: Response, next: NextFunction): void{
+  config.fileServerHits++;
   next();
 }
