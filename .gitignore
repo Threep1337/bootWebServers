@@ -2,3 +2,4 @@ server.log
 .env
 dist/
 node_modules/
+src/db/migrations/

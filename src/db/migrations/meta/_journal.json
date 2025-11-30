@@ -8,6 +8,20 @@
       "when": 1764359317715,
       "tag": "0000_careless_captain_midlands",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1764444368129,
+      "tag": "0001_gray_rogue",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1764444485012,
+      "tag": "0002_silly_firestar",
+      "breakpoints": true
     }
   ]
 }

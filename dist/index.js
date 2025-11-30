@@ -1,6 +1,6 @@
 import express from "express";
 import { handlerMetrics, handlerReadiness, handlerReset } from "./api/handlers.js";
-import { handlerChirpsValidate } from "./api/chirps.js";
+import { handlerChirps, handlerGetAllChirps, handlerGetSingleChirp } from "./api/chirps.js";
 import { middlewareLogResponses, middlewareMetricsInc } from "./api/middleware.js";
 import { handlerCreateUser } from "./api/users.js";
 import { errorHandler } from "./api/error.js";
@@ -46,9 +46,25 @@ app.get("/api/healthz", async (req, res, next) => {
         next(err);
     }
 });
-app.post("/api/validate_chirp", async (req, res, next) => {
+app.post("/api/chirps", async (req, res, next) => {
     try {
-        await handlerChirpsValidate(req, res);
+        await handlerChirps(req, res);
+    }
+    catch (err) {
+        next(err);
+    }
+});
+app.get("/api/chirps", async (req, res, next) => {
+    try {
+        await handlerGetAllChirps(req, res);
+    }
+    catch (err) {
+        next(err);
+    }
+});
+app.get("/api/chirps/:chirpID", async (req, res, next) => {
+    try {
+        await handlerGetSingleChirp(req, res);
     }
     catch (err) {
         next(err);

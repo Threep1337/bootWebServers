@@ -1,6 +1,8 @@
 import type { Request, Response } from "express";
 import { respondWithError, respondWithJSON } from "./json.js";
 import { badRequestError } from "./error.js";
+import { NewChirp } from "../db/schema.js";
+import { createChirp, getAllChirps, getChirpByID } from "../db/queries/chirps.js";
 
 function cleanChirp(chirp: string): string {
   const badWords = ['kerfuffle', 'sharbert', 'fornax'];
@@ -24,21 +26,36 @@ function cleanChirp(chirp: string): string {
 
 }
 
-export async function handlerChirpsValidate(req: Request, res: Response) {
-  type parameters = {
-    body: string;
-  };
 
-  const params:parameters = req.body;
+export async function handlerChirps(req: Request, res: Response) {
+
+  const chirp:NewChirp= req.body;
   const maxChirpLength = 140;
-  if (params.body.length > maxChirpLength) {
+  if (chirp.body.length > maxChirpLength) {
     throw new badRequestError("Chirp is too long. Max length is 140");
   }
 
   //Clean the chirp here
-  const cleanedChirp = cleanChirp(params.body);
+  chirp.body = cleanChirp(chirp.body);
 
-  respondWithJSON(res, 200, {
-    cleanedBody: cleanedChirp,
-  });
+  const result = await createChirp(chirp);
+
+   respondWithJSON(res, 201,result);
+}
+
+export async function handlerGetAllChirps(req: Request, res: Response) {
+
+  const result = await getAllChirps()
+
+   respondWithJSON(res, 200,result);
+}
+
+
+export async function handlerGetSingleChirp(req: Request, res: Response) {
+
+  const chirpID = req.params.chirpID;
+
+  const result = await getChirpByID(chirpID);
+  respondWithJSON(res,200,result);
+
 }
