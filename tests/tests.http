@@ -43,10 +43,26 @@ POST http://localhost:8080/api/users
 Content-Type:  application/json
 
 {
-  "email": "alangton1337@gmail.com"
+  "email": "alangton1337@gmail.com",
+  "password": "Temp1234"
+}
+###
+POST http://localhost:8080/api/login
+Content-Type:  application/json
+
+{
+  "email": "alangton1337@gmail.com",
+  "password": "Temp1234"
 }
 
+###
+POST http://localhost:8080/api/login
+Content-Type:  application/json
 
+{
+  "email": "alangton1337@gmail.com",
+  "password": "BADPASS"
+}
 
 ###
 GET http://localhost:8080/api/chirps

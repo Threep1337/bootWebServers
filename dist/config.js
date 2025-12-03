@@ -15,5 +15,6 @@ export const config = {
         url: envOrThrow("DB_URL"),
         migrationConfig: migrationConfig,
     },
-    platform: envOrThrow("PLATFORM")
+    platform: envOrThrow("PLATFORM"),
+    jwtSecret: envOrThrow("JWTSECRET")
 };

@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from "express";
 import { handlerMetrics, handlerReadiness, handlerReset } from "./api/handlers.js";
 import { handlerChirps,handlerGetAllChirps, handlerGetSingleChirp } from "./api/chirps.js";
 import { middlewareLogResponses, middlewareMetricsInc } from "./api/middleware.js";
-import { handlerCreateUser } from "./api/users.js";
+import { handlerCreateUser, handlerLoginUser } from "./api/users.js";
 import { errorHandler } from "./api/error.js";
 import postgres from "postgres";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
@@ -88,6 +88,13 @@ app.post("/api/users",async (req, res, next) => {
   }
 });
 
+app.post("/api/login",async (req, res, next) => {
+  try {
+    await handlerLoginUser(req, res);
+  } catch (err) {
+    next(err);
+  }
+});
 
 app.use(errorHandler);
 
