@@ -45,7 +45,7 @@ export async function handlerChirps(req: Request, res: Response) {
 
   //Clean the chirp here
   chirp.body = cleanChirp(chirp.body);
-  chirp.id = userID;
+  chirp.userId = userID;
 
   const result = await createChirp(chirp);
 
