@@ -3,6 +3,8 @@ import { JwtPayload } from "jsonwebtoken";
 import { unauthorizedError } from "./api/error.js";
 import { Request } from "express";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import { createRefreshToken } from "./db/queries/refreshTokens.js";
 
 const { sign, verify } = jwt;
 type payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
@@ -82,4 +84,10 @@ export function getBearerToken(req: Request): string{
   }
   return token;
 
+}
+
+export async function makeRefreshToken(userID: string,expiresIn: number){
+  const token = crypto.randomBytes(32).toString("hex");
+  await createRefreshToken(token,userID,expiresIn);
+  return token
 }

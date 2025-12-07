@@ -1,9 +1,9 @@
 import express from "express";
 import { Request, Response, NextFunction } from "express";
 import { handlerMetrics, handlerReadiness, handlerReset } from "./api/handlers.js";
-import { handlerChirps,handlerGetAllChirps, handlerGetSingleChirp } from "./api/chirps.js";
+import { handlerChirps,handlerDeleteChirp,handlerGetAllChirps, handlerGetSingleChirp } from "./api/chirps.js";
 import { middlewareLogResponses, middlewareMetricsInc } from "./api/middleware.js";
-import { handlerCreateUser, handlerLoginUser } from "./api/users.js";
+import { handlerCreateUser, handlerLoginUser, handlerRefresh, handlerRevokeRefreshToken, handlerUpdateUser } from "./api/users.js";
 import { errorHandler } from "./api/error.js";
 import postgres from "postgres";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
@@ -79,10 +79,25 @@ app.get("/api/chirps/:chirpID", async (req, res, next) => {
   }
 });
 
+app.delete("/api/chirps/:chirpID",async (req, res, next) => {
+  try {
+    await handlerDeleteChirp(req, res);
+  } catch (err) {
+    next(err);
+  }
+});
 
 app.post("/api/users",async (req, res, next) => {
   try {
     await handlerCreateUser(req, res);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.put("/api/users",async (req, res, next) => {
+  try {
+    await handlerUpdateUser(req, res);
   } catch (err) {
     next(err);
   }
@@ -95,6 +110,26 @@ app.post("/api/login",async (req, res, next) => {
     next(err);
   }
 });
+
+app.post("/api/refresh",async (req, res, next) => {
+  try {
+    await handlerRefresh(req, res);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post("/api/revoke",async (req, res, next) => {
+  try {
+    await handlerRevokeRefreshToken(req, res);
+  } catch (err) {
+    next(err);
+  }
+});
+
+
+
+
 
 app.use(errorHandler);
 
