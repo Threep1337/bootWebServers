@@ -16,5 +16,6 @@ export const config = {
         migrationConfig: migrationConfig,
     },
     platform: envOrThrow("PLATFORM"),
-    jwtSecret: envOrThrow("JWTSECRET")
+    jwtSecret: envOrThrow("JWTSECRET"),
+    polkaAPIKey: envOrThrow("POLKA_KEY"),
 };

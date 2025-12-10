@@ -86,6 +86,24 @@ export function getBearerToken(req: Request): string{
 
 }
 
+export function getAPIKey(req: Request): string{
+
+  const authHeader = req.get("Authorization");
+
+  if (authHeader === undefined)
+  {
+    throw new unauthorizedError("API Key is invalid");
+  }
+
+  const apiKey = authHeader.replace("ApiKey ","");
+  if (apiKey === "")
+  {
+    throw new unauthorizedError("API Key is invalid");
+  }
+  return apiKey;
+
+}
+
 export async function makeRefreshToken(userID: string,expiresIn: number){
   const token = crypto.randomBytes(32).toString("hex");
   await createRefreshToken(token,userID,expiresIn);

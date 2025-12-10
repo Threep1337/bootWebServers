@@ -17,6 +17,13 @@ export async function getAllChirps()
   return result;
 }
 
+export async function getChirpsByAuthorID(authorID:string)
+{
+  console.log (`Searching DB for author ID: ${authorID}`)
+  const result = await db.select().from(chirps).where(eq(chirps.userId,authorID));
+  return result;
+}
+
 export async function getChirpByID(chirpID: string)
 {
   const [result] = await db.select().from(chirps).where(eq(chirps.id,chirpID));

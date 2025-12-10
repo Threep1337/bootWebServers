@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
 import { respondWithError, respondWithJSON } from "./json.js";
-import { badRequestError, notFoundError,forbiddenError } from "./error.js";
+import { badRequestError, notFoundError, forbiddenError } from "./error.js";
 import { NewChirp } from "../db/schema.js";
-import { createChirp, getAllChirps, getChirpByID,deleteChirpByID } from "../db/queries/chirps.js";
+import { createChirp, getAllChirps, getChirpByID, deleteChirpByID,getChirpsByAuthorID } from "../db/queries/chirps.js";
 import { getBearerToken, validateJWT } from "../auth.js";
 import { config } from "../config.js";
 
@@ -54,7 +54,35 @@ export async function handlerChirps(req: Request, res: Response) {
 
 export async function handlerGetAllChirps(req: Request, res: Response) {
 
-  const result = await getAllChirps()
+
+  let sort='asc'
+  let sortQuery = req.query.sort;
+  if (sortQuery === "desc") {
+      sort = 'desc'
+  }
+
+  let result;
+  let authorId = "";
+  let authorIdQuery = req.query.authorId;
+  if (typeof authorIdQuery === "string") {
+    
+    authorId = authorIdQuery;
+    console.log (`Searching for author ID: ${authorId}`)
+
+    result = await getChirpsByAuthorID(authorId);
+
+  }else
+  {
+
+    result = await getAllChirps()
+  }
+
+  if (sort != 'desc'){
+    result.sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  }
+  else{
+    result.sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
 
   respondWithJSON(res, 200, result);
 }
@@ -66,7 +94,7 @@ export async function handlerGetSingleChirp(req: Request, res: Response) {
 
   const result = await getChirpByID(chirpID);
 
-  if (!result){
+  if (!result) {
     throw new notFoundError("No chirp found!");
   }
   respondWithJSON(res, 200, result);
@@ -77,14 +105,14 @@ export async function handlerDeleteChirp(req: Request, res: Response) {
   const chirpID = req.params.chirpID;
   const accessToken = getBearerToken(req);
   const userFromToken = validateJWT(accessToken, config.jwtSecret);
-  
+
   const chirp = await getChirpByID(chirpID);
 
-  if (!chirp){
+  if (!chirp) {
     throw new notFoundError("No chirp found!")
   }
 
-  if (chirp.userId != userFromToken){
+  if (chirp.userId != userFromToken) {
     throw new forbiddenError("The chirp does not belong to this user, it cannot be deleted.");
   }
 

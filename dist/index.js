@@ -2,7 +2,7 @@ import express from "express";
 import { handlerMetrics, handlerReadiness, handlerReset } from "./api/handlers.js";
 import { handlerChirps, handlerDeleteChirp, handlerGetAllChirps, handlerGetSingleChirp } from "./api/chirps.js";
 import { middlewareLogResponses, middlewareMetricsInc } from "./api/middleware.js";
-import { handlerCreateUser, handlerLoginUser, handlerRefresh, handlerRevokeRefreshToken, handlerUpdateUser } from "./api/users.js";
+import { handlerCreateUser, handlerLoginUser, handlerRefresh, handlerRevokeRefreshToken, handlerUpdateUser, handlerUpgradeUser } from "./api/users.js";
 import { errorHandler } from "./api/error.js";
 import postgres from "postgres";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
@@ -113,6 +113,14 @@ app.post("/api/refresh", async (req, res, next) => {
 app.post("/api/revoke", async (req, res, next) => {
     try {
         await handlerRevokeRefreshToken(req, res);
+    }
+    catch (err) {
+        next(err);
+    }
+});
+app.post("/api/polka/webhooks", async (req, res, next) => {
+    try {
+        await handlerUpgradeUser(req, res);
     }
     catch (err) {
         next(err);

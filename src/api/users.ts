@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import { config } from "../config.js";
 import { parse } from "path";
-import { createUser, lookupUserByEmail, updateUser } from "../db/queries/users.js";
+import { createUser, lookupUserByEmail, updateUser, upgradeUser } from "../db/queries/users.js";
 import { NewUser, user } from "../db/schema.js";
 import { respondWithJSON } from "./json.js";
-import { hashPassword, checkPasswordHash, makeRefreshToken, getBearerToken, validateJWT } from "../auth.js";
+import { hashPassword, checkPasswordHash, makeRefreshToken, getBearerToken, validateJWT,getAPIKey } from "../auth.js";
 import { makeJWT } from "../auth.js";
 import { getUserFromRefreshToken, revokeRefreshToken } from "../db/queries/refreshTokens.js";
-import { unauthorizedError } from "./error.js";
+import { notFoundError, unauthorizedError } from "./error.js";
 
 export async function handlerCreateUser(req: Request, res: Response): Promise<void> {
     type parameters = {
@@ -91,7 +91,8 @@ export async function handlerLoginUser(req: Request, res: Response): Promise<voi
             updatedAt: userLookup.updatedAt,
             email: userLookup.email,
             token: token,
-            refreshToken: refreshToken
+            refreshToken: refreshToken,
+            isChirpyRed:userLookup.isChirpyRed
         };
 
 
@@ -136,3 +137,38 @@ export async function handlerRevokeRefreshToken(req: Request, res: Response): Pr
 
 }
 
+export async function handlerUpgradeUser(req: Request, res: Response): Promise<void> {
+    type parameters = {
+        event: string;
+        data: {
+            userId: string
+        };
+    };
+
+    const apiKey = getAPIKey(req);
+
+    if (apiKey != config.polkaAPIKey){
+        throw new unauthorizedError("Bad API Key");
+    }
+
+    //const accessToken = getBearerToken(req);
+    //const userFromToken = validateJWT(accessToken,config.jwtSecret);
+    const params: parameters = req.body;
+
+    console.log(`the event is ${params.event}`)
+    if (params.event != 'user.upgraded')
+    {
+        res.status(204).send();
+        return;
+    }
+
+    const result = await upgradeUser(params.data.userId);
+
+    if (result){
+        res.status(204).send();
+    }else
+    {
+        throw new notFoundError("No user found");
+    }
+
+}
